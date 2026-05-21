@@ -1,4 +1,3 @@
-
 function GameObject(obj)
 {	
 		this.x = canvas.width/2;
@@ -85,7 +84,7 @@ function GameObject(obj)
 		   this.top().y <= obj.bottom().y &&
 		   this.bottom().y >= obj.top().y)
 		{
-			return true
+			return true;
 		}
 		return false;
 	}

@@ -3,35 +3,42 @@ var context;
 var timer;
 var interval;
 var player;
+var score = 0;
 
 
 	canvas = document.getElementById("canvas");
 	context = canvas.getContext("2d");	
 	canvas.style.backgroundColor="grey";
 	
-	var amount = 25;
-	var squares = [];
-	var circles = [];
+	var amount = 5;
+	var items = [];
+	var hazards = [];
 	
 	player = new GameObject({width:50, height:50})
 	player.x = canvas.width/2;
 	player.y = canvas.height - 50;
+	player.vx = 0;
+	player.vy = 0;
+	player.ax = 1;
+	player.ay = 1;
+	player.force = 1;
+	player.color = "#eeff00";
 	
 	for(var i = 0; i < amount; i++)
 	{
-		squares[i] = new GameObject({width:20, height:20});
-		circles[i] = new GameObject({width:20, height:20});
+		items[i] = new GameObject({width:20, height:20});
+		hazards[i] = new GameObject({width:20, height:20});
 		
-		squares[i].color = "#00ff00";
-		circles[i].color = "#ff0000";
+		items[i].color = "#00ff00";
+		hazards[i].color = "#ff0000";
 	
-		squares[i].x = Math.random() * canvas.width;
-		squares[i].y = Math.random() * canvas.height;
-		squares[i].vy = Math.random() * 10 + 5;
+		items[i].x = Math.random() * canvas.width;
+		items[i].y = Math.random() * canvas.height;
+		items[i].vy = Math.random() * 10 + 3;
 		
-		circles[i].x = Math.random() * canvas.width;
-		circles[i].y = Math.random() * canvas.height;
-		circles[i].vy = Math.random() * 10 + 5;
+		hazards[i].x = Math.random() * canvas.width;
+		hazards[i].y = Math.random() * canvas.height;
+		hazards[i].vy = Math.random() * 10 + 3;
 
 	}
 	
@@ -46,39 +53,81 @@ var player;
 function animate()
 {	
 	context.clearRect(0,0,canvas.width, canvas.height);	
+
+	context.fillStyle = "white";
+	context.font = "30px Arial";
+	context.fillText("Score: " + score, 20, 40);
 	
-	for(var p = 0; p < squares.length; p++)
-	{	
-		squares[p].x += squares[p].vx;
-		squares[p].y += squares[p].vy;
-
-		if (squares[p].y > canvas.height)
-        {
-            squares[p].y = -squares[p].height;
-            squares[p].vy = Math.random() * 10 + 5;
-        }
-
-		squares[p].drawRect();
+	if (a) 
+	{
+		player.vx += -player.ax * player.force;
 	}
 
-	for(var p = 0; p < circles.length; p++)
-	{	
-		circles[p].x += circles[p].vx;
-		circles[p].y += circles[p].vy;
+	if (d) 
+	{
+		player.vx += player.ax * player.force;
+	}
 
-		if (circles[p].y > canvas.height)
+	player.vx *= fX;
+	player.vy *= fY;
+
+	player.x += player.vx;
+	player.y += player.vy;
+
+
+
+	
+	for(var p = 0; p < items.length; p++)
+	{	
+		items[p].y += items[p].vy;
+
+		if (items[p].y > canvas.height)
         {
-            circles[p].y = -circles[p].height;
-            circles[p].vy = Math.random() * 10 + 5;
+            items[p].y = -items[p].height;
+			items[p].x = Math.random() * canvas.width;
+            items[p].vy = Math.random() * 10 + 3;
         }
 
-		circles[p].drawCircle();
+		if (items[p].hitTestObject(player)) 
+		{
+			score++
+			player.color = "#36e636";
+			setTimeout(function() {player.color = "yellow";}, 500);
+			items[p].x = Math.random() * canvas.width;
+			items[p].y = -items[p].height;
+			items[p].vy = Math.random() * 10 + 3; 
+		}
+
+		items[p].drawRect();
+	}
+
+	for(var p = 0; p < hazards.length; p++)
+	{	
+		hazards[p].x += hazards[p].vx;
+		hazards[p].y += hazards[p].vy;
+
+		if (hazards[p].y > canvas.height)
+        {
+            hazards[p].y = -hazards[p].height;
+			hazards[p].x = Math.random() * canvas.width;
+            hazards[p].vy = Math.random() * 10 + 3;
+        }
+
+		if (hazards[p].hitTestObject(player)) 
+		{
+			score = 0;
+			player.color = "#e63636";
+			setTimeout(function() {player.color = "yellow";}, 500);
+			hazards[p].x = Math.random() * canvas.width;
+			hazards[p].y = -items[p].height;
+			hazards[p].vy = Math.random() * 10 + 3; 
+		}
+
+		hazards[p].drawCircle();
 	}
 
 	player.drawRect();
 
-
-	
 
 }
 
